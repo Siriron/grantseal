@@ -1,0 +1,1 @@
+import { Link } from 'react-router-dom'; export default function NotFound(){return <div className="empty page"><h1>404</h1><p>This route does not exist in GrantSeal.</p><Link className="primary-btn" to="/">Return to dashboard</Link></div>}
