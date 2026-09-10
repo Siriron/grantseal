@@ -1,1 +1,1 @@
-
+import { LoaderCircle } from 'lucide-react'; export default function AsyncButton({loading,children,className='',...props}){return <button {...props} disabled={loading||props.disabled} className={`primary-btn ${className}`}>{loading&&<LoaderCircle size={17} className="spin"/>}{children}</button>}
