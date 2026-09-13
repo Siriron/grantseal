@@ -18,7 +18,7 @@
 
 GrantSeal is a public accountability workflow for open-source grant programs. A grantor locks a repository and milestone criteria before work begins. The recipient submits an exact Git commit. A challenger may dispute the submission, the recipient may respond, and GenLayer validators independently adjudicate the locked criteria against canonical GitHub records.
 
-**Deployed contract:** https://explorer-studio.genlayer.com/address/0x73972983906646bfc591acDCD513fA2830d52ab9
+**Deployed contract:** https://explorer-studio.genlayer.com/address/0x29E654749F76722AB18F63471d11F1af1433a8ce
 
 ## Lifecycle
 
@@ -34,7 +34,7 @@ GrantSeal is a public accountability workflow for open-source grant programs. A 
 10. `resolve_appeal`
 11. `close_program`
 
-The four reachable outcomes are `MET`, `PARTIALLY_MET`, `NOT_MET`, and `INCONCLUSIVE`.
+The four reachable outcomes are `MET`, `PARTIALLY_MET`, `NOT_MET`, and `INCONCLUSIVE`. The response window is 72 hours from milestone submission; a resolved milestone has a 48-hour appeal window.
 
 ## Evidence model
 
@@ -67,9 +67,9 @@ docs/                        Architecture, deployment, frontend and contract doc
 
 ## Status
 
-The GenLayer StudioNet contract is deployed at `0x73972983906646bfc591acDCD513fA2830d52ab9`.
+The GenLayer StudioNet contract is deployed at `0x29E654749F76722AB18F63471d11F1af1433a8ce`.
 
-The frontend is wired to that exact address as a plain constant in `src/config/chains.js`. A production frontend URL is intentionally not claimed here until the app itself is deployed.
+The frontend is wired to that exact address as a plain constant in `src/config/chains.js`. A production frontend URL is intentionally not claimed here until the app itself is deployed. The deployed contract source is the Revision 2 contract whose storage-boundary address normalization was verified live by a successful `create_program` call.
 
 ## License
 
