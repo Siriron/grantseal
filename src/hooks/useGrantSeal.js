@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { createClient, isSuccessful } from 'genlayer-js'
+import { createClient } from 'genlayer-js'
 import { studionet } from 'genlayer-js/chains'
 import { CONTRACT_ADDRESS, explorerTx } from '../config/chains'
 import { TimeoutError } from '../lib/errors'
@@ -32,14 +32,28 @@ export function useGrantSeal(account,ensureChain){
    try{
      const receipt=await client.waitForDecision({hash,retries:120,interval:4000})
      setTx({hash,status:'CONSENSUS_ACCEPTED',functionName,receipt})
-     // Consensus acceptance is not execution success. GenLayer's canonical
-     // success predicate requires an accepted/decided transaction whose
-     // execution result is FINISHED_WITH_RETURN.
-     if(!isSuccessful(receipt)){
-       const message=receipt?.txExecutionResultName
-         ? `Contract execution failed: ${receipt.txExecutionResultName}${receipt?.executionError ? ` — ${errorText(receipt.executionError)}` : ''}`
-         : `Contract execution failed: ${errorText(receipt?.error || receipt?.revertReason || 'Unknown execution error')}`
+     // Consensus acceptance is not execution success. The 1.1.x SDK does
+     // not export the newer isSuccessful helper, so inspect the materialized
+     // execution result directly and never treat ACCEPTED alone as success.
+     const executionResultName = receipt?.txExecutionResultName
+       ?? receipt?.executionResult?.name
+       ?? receipt?.executionResult
+       ?? null
+     const executionError = receipt?.executionError
+       ?? receipt?.error
+       ?? receipt?.revertReason
+       ?? null
+     if(executionError || (executionResultName && executionResultName !== 'FINISHED_WITH_RETURN')){
+       const detail = executionError
+         ? errorText(executionError)
+         : `execution result: ${executionResultName}`
+       const message = `Contract execution failed: ${detail}`
        setTx({hash,status:'EXECUTION_FAILED',functionName,receipt,error:message})
+       throw new Error(message)
+     }
+     if(!executionResultName){
+       const message = 'Consensus accepted, but the SDK did not expose a materialized execution result. Open the explorer transaction for the execution outcome.'
+       setTx({hash,status:'EXECUTION_STATUS_UNKNOWN',functionName,receipt,error:message})
        throw new Error(message)
      }
      setTx({hash,status:'EXECUTION_SUCCEEDED',functionName,receipt})
