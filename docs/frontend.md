@@ -12,4 +12,4 @@ Reads decode the JSON strings returned by the three public view methods. The add
 
 ## Transaction UX
 
-Every write has pending UI. Resolution and appeal explain that consensus can take several minutes. A timeout after a transaction hash exists is surfaced separately from a rejected write so users are directed to the explorer rather than blindly duplicating the state-changing call.
+Every write has explicit submission, consensus, execution-success/failure, and state-refresh states. The frontend uses GenLayerJS's `isSuccessful()` result rather than treating `Accepted` as execution success. Resolution and appeal explain that consensus can take several minutes. A timeout after a transaction hash exists is surfaced separately from a rejected write so users are directed to the explorer rather than blindly duplicating the state-changing call.
