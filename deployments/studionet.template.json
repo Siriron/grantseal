@@ -1,0 +1,16 @@
+{
+  "network": "studionet",
+  "contract_file": "contracts/grantseal.py",
+  "git_commit": "REPLACE_WITH_DEPLOYMENT_TIME_GIT_COMMIT_SHA",
+  "contract_source_sha256": "REPLACE_WITH_DEPLOYED_SOURCE_SHA256",
+  "deployment_tx": "REPLACE_WITH_DEPLOYMENT_TRANSACTION_HASH",
+  "contract_address": "0x29E654749F76722AB18F63471d11F1af1433a8ce",
+  "explorer_address": "https://explorer-studio.genlayer.com/address/0x29E654749F76722AB18F63471d11F1af1433a8ce",
+  "deployed_at_utc": "REPLACE_WITH_DEPLOYMENT_TIMESTAMP",
+  "verification": {
+    "source_matches_git_revision": "REQUIRES_DEPLOYMENT_TIME_GIT_EVIDENCE",
+    "tests_command": "pytest tests/direct -v",
+    "lint_command": "genvm-lint check contracts/grantseal.py",
+    "deployment_command": "genlayer network set studionet && genlayer network info && genlayer deploy --contract contracts/grantseal.py"
+  }
+}
