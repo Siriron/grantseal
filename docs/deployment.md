@@ -10,7 +10,7 @@
 
 ## Frontend
 
-The frontend is ready for a Vercel SPA deployment. No production URL is asserted until deployment is completed.
+Live production URL: **https://grantseal-layer.vercel.app/**
 
 ```bash
 npm install
@@ -25,4 +25,4 @@ The production StudioNet address is fixed at `0x29E654749F76722AB18F63471d11F1af
 
 The full GrantSeal lifecycle has now been verified live, end to end, on StudioNet: `create_program` → `define_milestone` → `accept_program` → `lock_program` → `submit_milestone` → `challenge_milestone` → `respond_to_challenge` → `resolve_milestone` → `appeal_milestone` → `resolve_appeal` → `close_program`. An early `resolve_milestone(1)` attempt correctly returned `AssertionError: response window still open` before the 72-hour response window elapsed — this is the precommitted deadline being enforced, not a defect. After the window elapsed, `resolve_milestone` and, later, `resolve_appeal` each independently fetched fresh evidence and re-derived the identifier-binding checks from scratch, both arriving at `INCONCLUSIVE` with `repo_bound`/`commit_bound`/`coverage` all confirmed `true`. See `docs/review-evidence.md` for the full transaction table.
 
-Still outstanding before resubmission: the exact deploy-time Git commit SHA, the deployment transaction hash, and a live Vercel frontend URL — see `docs/review-evidence.md` for the complete list.
+Still outstanding before resubmission: the exact deploy-time Git commit SHA and the deployment transaction hash — see `docs/review-evidence.md` for the complete list. The frontend is now live at https://grantseal-layer.vercel.app/; confirm in-browser (wallet connect, program/milestone state rendering, write-transaction flow) before citing it as fully verified rather than merely reachable.
