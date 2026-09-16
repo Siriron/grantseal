@@ -69,7 +69,7 @@ docs/                        Architecture, deployment, frontend and contract doc
 
 The GenLayer StudioNet contract is deployed at `0x29E654749F76722AB18F63471d11F1af1433a8ce`.
 
-The frontend is wired to that exact address as a plain constant in `src/config/chains.js`. A production frontend URL is intentionally not claimed here until the app itself is deployed. The deployed contract source is the Revision 2 contract whose storage-boundary address normalization was verified live by a successful `create_program` call.
+Live frontend: **https://grantseal-layer.vercel.app/**, wired to that exact address as a plain constant in `src/config/chains.js`. The deployed contract source is the Revision 2 contract whose storage-boundary address normalization was verified live by a successful `create_program` call. The full write-method lifecycle — create_program through close_program, including a real challenge, resolution, and appeal — has been executed live end to end; see `docs/review-evidence.md` for the complete transaction table.
 
 ## License
 
