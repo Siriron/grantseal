@@ -8,7 +8,7 @@ Browser-wallet writes use `window.ethereum`, pass the connected address directly
 
 ## Contract state
 
-Reads decode the JSON strings returned by the three public view methods. The address exists in exactly one application location: `src/config/chains.js`.
+Reads decode the JSON strings returned by the public view methods (`get_counts`, `get_program`, `get_milestone`; `get_config` reports the deployed windows and is not needed for rendering). The address exists in exactly one application location: `src/config/chains.js`.
 
 ## Transaction UX
 

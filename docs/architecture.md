@@ -14,3 +14,11 @@ The frontend reads `get_counts()` and scans the currently allocated IDs through 
 ## Consensus path
 
 Resolution and appeal each run their own nondeterministic consensus round. The appeal re-fetches canonical records and performs a fresh judgment against the same locked criteria.
+
+## Time
+
+Deadlines are computed from the transaction timestamp (`gl.message_raw["datetime"]`, parsed with integer arithmetic). The response and appeal windows are constructor parameters fixed at deployment; there is no way to change them afterwards, so a deadline is always the submission or resolution time plus a value that was public before any program existed.
+
+## Failure handling
+
+A fetch that returns an HTTP error status is treated as absent evidence, never as a record. Any missing identity match, missing tree, or empty evidence set produces `INCONCLUSIVE` before the model is called. The model's answer is decoded from the dict the SDK returns; an unknown or malformed answer also resolves to `INCONCLUSIVE`.
