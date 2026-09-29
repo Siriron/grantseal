@@ -1,0 +1,11 @@
+{
+  "network": "GenLayer StudioNet",
+  "chain_id": 61999,
+  "contract_address": "0x257b34Eb0fc3C4fFBdd52775e08a95670C8382C7",
+  "explorer_address": "https://explorer-studio.genlayer.com/address/0x257b34Eb0fc3C4fFBdd52775e08a95670C8382C7",
+  "deployment_tx": "0x010b7878376efea6c7d72313d3e1d801d01fa935a2f81b2e35711d08f1dc6faf",
+  "deployer": "0x27b79B11aeC2ffC17C3115EEb472EC4fd015F635",
+  "deployed_at_utc": "2026-09-29T02:23:52Z",
+  "response_window_seconds": 600,
+  "appeal_window_seconds": 900
+}
