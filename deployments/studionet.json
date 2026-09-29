@@ -7,5 +7,8 @@
   "deployer": "0x27b79B11aeC2ffC17C3115EEb472EC4fd015F635",
   "deployed_at_utc": "2026-09-29T02:23:52Z",
   "response_window_seconds": 600,
-  "appeal_window_seconds": 900
+  "appeal_window_seconds": 900,
+  "source_git_revision": "8f4b683ca4f6c4756f55e0a067c0a53679ba6d23",
+  "contract_source_sha256": "ea6fe1156cccceacbd0892ea213c877f1491a7e666be78beabe5abd99cc51495",
+  "graded_commit": "117a9ad4a6f0d08eb0cdb88c27b894ede593a858"
 }
