@@ -9,7 +9,7 @@
 ![License](https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square)
 ![Stack](https://img.shields.io/badge/stack-React%20%2B%20Vite%20%2B%20GenLayerJS-55e6a5?style=flat-square)
 
-**[Architecture](./docs/architecture.md)** · **[Deployment](./docs/deployment.md)** · **[Frontend](./docs/frontend.md)** · **[Contracts](./docs/contracts.md)**
+**[Live App](https://grantseal-layer.vercel.app/)** · **[Contract on StudioNet](https://explorer-studio.genlayer.com/address/0x257b34Eb0fc3C4fFBdd52775e08a95670C8382C7)** · **[Architecture](./docs/architecture.md)** · **[Deployment](./docs/deployment.md)** · **[Frontend](./docs/frontend.md)** · **[Contracts](./docs/contracts.md)**
 </div>
 
 ---
@@ -17,6 +17,8 @@
 ## What this is
 
 GrantSeal is a public accountability workflow for open-source grant programs. A grantor locks a repository and milestone criteria before work begins. The recipient submits an exact Git commit. A challenger may dispute the submission, the recipient may respond, and GenLayer validators independently adjudicate the locked criteria against canonical GitHub records.
+
+**Deployed contract:** `0x257b34Eb0fc3C4fFBdd52775e08a95670C8382C7` on GenLayer StudioNet. Deployment transaction, source revision, source digest and windows are recorded in [`deployments/studionet.json`](./deployments/studionet.json); the live transactions are in [`docs/review-evidence.md`](./docs/review-evidence.md).
 
 ## Lifecycle
 
@@ -79,7 +81,7 @@ docs/                        Architecture, deployment, frontend and contract doc
 
 ## Status
 
-**Tests.** 43 direct-mode tests run the real contract under the GenVM SDK, including the real `leader_fn`/`validator_fn` closures, with `check_pickling` enabled on the nondet paths. Only the outside world is mocked: GitHub responses and the model's answer. They therefore prove the contract's own logic: authorization, state transitions, SHA validation, deadline enforcement to the second, milestone counts, the single-appeal rule, every verdict branch, fail-closed handling of HTTP errors and unusable model output, and validator agreement or rejection when a single decision-bearing field differs. They do **not** prove how real models behave on real repositories, real network behavior, or multi-node timing; that is what the live lifecycle in `docs/review-evidence.md` is for. See [`docs/testing.md`](./docs/testing.md).
+**Tests.** 43 direct-mode test cases run the real contract under the GenVM SDK, including the real `leader_fn`/`validator_fn` closures, with `check_pickling` enabled on the nondet paths. Only the outside world is mocked: GitHub responses and the model's answer. They therefore prove the contract's own logic: authorization, state transitions, SHA validation, deadline enforcement to the second, milestone counts, the single-appeal rule, every verdict branch, fail-closed handling of HTTP errors and unusable model output, and validator agreement or rejection when a single decision-bearing field differs. They do **not** prove how real models behave on real repositories, real network behavior, or multi-node timing; that is what the live lifecycle in `docs/review-evidence.md` is for. See [`docs/testing.md`](./docs/testing.md).
 
 **Revision 3 corrected two contract defects and a set of test defects found by executing the suite for the first time.** See [`docs/revision-3.md`](./docs/revision-3.md). Earlier deployments are superseded.
 
