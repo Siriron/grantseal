@@ -53,8 +53,14 @@ import base64
 _MAX_TEXT = 1800
 _MAX_CRITERIA = 8
 _MAX_CRITERION_LEN = 260
-_RESPONSE_WINDOW_SECONDS = 3 * 24 * 60 * 60
-_APPEAL_WINDOW_SECONDS = 2 * 24 * 60 * 60
+# Production defaults. The windows actually enforced by a deployment are fixed ONCE, in the
+# constructor, before any program exists, and can never be changed afterwards (there is no setter).
+# A review deployment may pass short windows so the whole lifecycle can be exercised in one
+# sitting; a production deployment passes these defaults. get_config() reports what is in force.
+DEFAULT_RESPONSE_WINDOW_SECONDS = 3 * 24 * 60 * 60
+DEFAULT_APPEAL_WINDOW_SECONDS = 2 * 24 * 60 * 60
+_MIN_WINDOW_SECONDS = 60
+_MAX_WINDOW_SECONDS = 30 * 24 * 60 * 60
 _MAX_TREE_ENTRIES = 160
 _MAX_EVIDENCE_FILES = 6
 _MAX_BLOB_CHARS = 7000
@@ -304,7 +310,7 @@ def _fetch_bounded_evidence(repo_id, commit_sha, criteria):
 def _fetch_json(url):
     try:
         response = gl.nondet.web.request(url, method="GET")
-        status = getattr(response, "status_code", None)
+        status = getattr(response, "status", None)
         if status is not None and status >= 400:
             return False, {}
         body = getattr(response, "body", None)
@@ -320,16 +326,28 @@ def _fetch_json(url):
 
 
 def _parse_outcome(raw):
-    try:
-        parsed = json.loads(raw)
-        if not isinstance(parsed, dict):
+    """Map the model's answer to one of _VALID_OUTCOMES.
+
+    gl.nondet.exec_prompt(..., response_format="json") returns an already-decoded dict, never a JSON
+    string, so it must NOT be passed through json.loads (that raised TypeError and silently forced
+    every verdict to INCONCLUSIVE). A string is still accepted defensively. Anything unrecognised
+    fails closed to INCONCLUSIVE, which is a reachable verdict only through genuinely missing or
+    ambiguous evidence, or an unusable model answer.
+    """
+    parsed = raw
+    if isinstance(raw, str):
+        try:
+            parsed = json.loads(raw)
+        except Exception:
             return "INCONCLUSIVE"
-        outcome = parsed.get("outcome", "INCONCLUSIVE")
-        if outcome in _VALID_OUTCOMES:
-            return outcome
+    if not isinstance(parsed, dict):
         return "INCONCLUSIVE"
-    except Exception:
-        return "INCONCLUSIVE"
+    outcome = parsed.get("outcome", "INCONCLUSIVE")
+    if isinstance(outcome, str):
+        outcome = outcome.strip().upper().replace(" ", "_").replace("-", "_")
+    if outcome in _VALID_OUTCOMES:
+        return outcome
+    return "INCONCLUSIVE"
 
 
 def _deterministic_summary(outcome, repo_id, commit_sha, appeal_round):
@@ -388,10 +406,17 @@ class GrantSeal(gl.Contract):
     milestones: TreeMap[u256, Milestone]
     next_program_id: u256
     next_milestone_id: u256
+    response_window_seconds: u256
+    appeal_window_seconds: u256
 
-    def __init__(self):
+    def __init__(self, response_window_seconds: int, appeal_window_seconds: int):
+        assert isinstance(response_window_seconds, int) and isinstance(appeal_window_seconds, int), "windows must be integers"
+        assert _MIN_WINDOW_SECONDS <= response_window_seconds <= _MAX_WINDOW_SECONDS, "response window out of range"
+        assert _MIN_WINDOW_SECONDS <= appeal_window_seconds <= _MAX_WINDOW_SECONDS, "appeal window out of range"
         self.next_program_id = u256(1)
         self.next_milestone_id = u256(1)
+        self.response_window_seconds = u256(response_window_seconds)
+        self.appeal_window_seconds = u256(appeal_window_seconds)
 
     # 1. Grantor creates a draft program. Scope is not yet immutable.
     @gl.public.write
@@ -436,7 +461,7 @@ class GrantSeal(gl.Contract):
         try:
             criteria = json.loads(criteria_json)
         except Exception:
-            raise Exception("criteria must be JSON array")
+            raise gl.vm.UserError("criteria must be JSON array")
         assert isinstance(criteria, list) and 1 <= len(criteria) <= _MAX_CRITERIA, "invalid criteria count"
         clean_criteria = []
         for item in criteria:
@@ -520,7 +545,7 @@ class GrantSeal(gl.Contract):
         milestone.submission_note = _sanitize(submission_note)
         milestone.status = "SUBMITTED"
         milestone.submitted_at = u256(now_ts)
-        milestone.response_deadline = u256(now_ts + _RESPONSE_WINDOW_SECONDS)
+        milestone.response_deadline = u256(now_ts + int(self.response_window_seconds))
         self.milestones[milestone_id] = milestone
         return json.dumps({
             "milestone_id": int(milestone_id),
@@ -640,7 +665,7 @@ Bounded repository evidence at the exact submitted SHA:
         self.programs[stored.program_id] = program
         stored.reasoning_summary = _deterministic_summary(result["outcome"], repo_id, commit_sha, False)
         stored.resolved_at = u256(now_ts)
-        stored.appeal_deadline = u256(now_ts + _APPEAL_WINDOW_SECONDS)
+        stored.appeal_deadline = u256(now_ts + int(self.appeal_window_seconds))
         self.milestones[milestone_id] = stored
         return json.dumps({"milestone_id": int(milestone_id), "status": "RESOLVED", "outcome": stored.outcome})
 
@@ -798,3 +823,10 @@ Bounded repository evidence at the exact submitted SHA:
     @gl.public.view
     def get_counts(self) -> str:
         return json.dumps({"next_program_id": int(self.next_program_id), "next_milestone_id": int(self.next_milestone_id)})
+
+    @gl.public.view
+    def get_config(self) -> str:
+        return json.dumps({
+            "response_window_seconds": int(self.response_window_seconds),
+            "appeal_window_seconds": int(self.appeal_window_seconds),
+        })
